@@ -189,6 +189,7 @@ jobs:
         #run: bash scripts/build.sh all
       - name: Build kernel
         run: |
+          # shellcheck disable=SC2016
           cd ${{ env.WORKSPACE }}/android-kernel
           make ARCH=arm64 mrproper
           sed -i 's/^config CRYPTO_ECDSA/# config CRYPTO_ECDSA/g' crypto/Kconfig
