@@ -191,13 +191,12 @@ jobs:
         run: |
           cd ${{ env.WORKSPACE }}/android-kernel
           make ARCH=arm64 mrproper
-          echo "=== crypto/Makefile BEFORE cleanup ==="
-          cat crypto/Makefile | grep -n "ecdh\|ecdsa" || echo "No such lines"
-          # 删除所有包含 ecdh/ecdsa 的行
+          # 清理 crypto 残留
           sed -i '/ecdh/d' crypto/Makefile
           sed -i '/ecdsa/d' crypto/Makefile
-          # 删除所有 crypto 目录下的 .o 文件（防止旧的依赖）
           rm -f crypto/*.o crypto/*.a crypto/*.asn1.*
+          # 修复 rpmb-mtk.c 符号缺失
+          sed -i '/^#include/a extern struct mmc_host *mtk_mmc_host[];' drivers/char/rpmb/rpmb-mtk.c
           cd -
           bash scripts/build.sh all
           
