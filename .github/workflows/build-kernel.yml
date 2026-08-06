@@ -185,9 +185,17 @@ jobs:
           key: kernel-${{ env.DEVICE }}-${{ env.KSU_VARIANT }}-${{ env.KERNEL_VERSION }}
           max-size: 2G
 
+      #- name: Build kernel
+        #run: bash scripts/build.sh all
       - name: Build kernel
-        run: bash scripts/build.sh all
-
+        run: |
+          cd ${{ env.WORKSPACE }}/android-kernel
+          make ARCH=arm64 mrproper
+          sed -i 's/^config CRYPTO_ECDSA/# config CRYPTO_ECDSA/g' crypto/Kconfig
+          sed -i 's/^config CRYPTO_ECDH/# config CRYPTO_ECDH/g' crypto/Kconfig
+          cd -
+          bash scripts/build.sh all
+          
       - name: Package artifacts
         run: bash scripts/package.sh all
 
