@@ -195,8 +195,9 @@ jobs:
           sed -i '/ecdh/d' crypto/Makefile
           sed -i '/ecdsa/d' crypto/Makefile
           rm -f crypto/*.o crypto/*.a crypto/*.asn1.*
-          # 修复 rpmb-mtk.c 符号缺失
+          # 修复 rpmb-mtk.c 符号缺失 + 未使用变量
           sed -i '/^#include/a extern struct mmc_host *mtk_mmc_host[];' drivers/char/rpmb/rpmb-mtk.c
+          sed -i 's/struct mmc_host \*mmc = mtk_mmc_host\[0\];/\/\/ struct mmc_host *mmc = mtk_mmc_host[0];/' drivers/char/rpmb/rpmb-mtk.c
           cd -
           bash scripts/build.sh all
           
