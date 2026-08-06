@@ -191,15 +191,18 @@ jobs:
         run: |
           cd ${{ env.WORKSPACE }}/android-kernel
           make ARCH=arm64 mrproper
-          echo "=== Before modification ==="
-          grep -n "ecdsa\|ecdh" crypto/Makefile || echo "No ecdsa/ecdh lines"
+          # 打印 crypto/Makefile 中 ecdsa/ecdh 相关行（供诊断）
+          echo "=== crypto/Makefile (ecdsa/ecdh lines) ==="
+          grep -n "ecdsa\|ecdh" crypto/Makefile || echo "No such lines"
+          # 禁用 Kconfig 中的选项
           sed -i "s/^config CRYPTO_ECDSA/# config CRYPTO_ECDSA/g" crypto/Kconfig
           sed -i "s/^config CRYPTO_ECDH/# config CRYPTO_ECDH/g" crypto/Kconfig
           sed -i "s/^config CRYPTO_ECC/# config CRYPTO_ECC/g" crypto/Kconfig
+          # 直接删除源文件（让 make 找不到它们）
+          rm -f crypto/ecdsa.c crypto/ecdh.c crypto/ecdh_helper.c
+          # 顺便也注释 Makefile 中的行（双重保险）
           sed -i "s/^obj-\$(CONFIG_CRYPTO_ECDSA) += ecdsa.o/# obj-\$(CONFIG_CRYPTO_ECDSA) += ecdsa.o/g" crypto/Makefile
           sed -i "s/^obj-\$(CONFIG_CRYPTO_ECDH) += ecdh.o/# obj-\$(CONFIG_CRYPTO_ECDH) += ecdh.o/g" crypto/Makefile
-          echo "=== After modification ==="
-          grep -n "ecdsa\|ecdh" crypto/Makefile || echo "No ecdsa/ecdh lines"
           cd -
           bash scripts/build.sh all
           
