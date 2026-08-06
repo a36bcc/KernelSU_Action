@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euxo pipefail   # 加入 x，打印每条执行的命令
 # Prepare the defconfig and compile the kernel.
 
 set -euo pipefail
