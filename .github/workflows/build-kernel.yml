@@ -193,6 +193,7 @@ jobs:
           make ARCH=arm64 mrproper
           sed -i 's/^config CRYPTO_ECDSA/# config CRYPTO_ECDSA/g' crypto/Kconfig
           sed -i 's/^config CRYPTO_ECDH/# config CRYPTO_ECDH/g' crypto/Kconfig
+          sed -i 's/^config CRYPTO_ECC/# config CRYPTO_ECC/g' crypto/Kconfig
           cd -
           bash scripts/build.sh all
           
