@@ -189,14 +189,13 @@ jobs:
         #run: bash scripts/build.sh all
       - name: Build kernel
         run: |
-          # shellcheck disable=SC2016
           cd ${{ env.WORKSPACE }}/android-kernel
           make ARCH=arm64 mrproper
-          sed -i 's/^config CRYPTO_ECDSA/# config CRYPTO_ECDSA/g' crypto/Kconfig
-          sed -i 's/^config CRYPTO_ECDH/# config CRYPTO_ECDH/g' crypto/Kconfig
-          sed -i 's/^config CRYPTO_ECC/# config CRYPTO_ECC/g' crypto/Kconfig
-          sed -i 's/^obj-\$(CONFIG_CRYPTO_ECDSA) += ecdsa.o/# obj-\$(CONFIG_CRYPTO_ECDSA) += ecdsa.o/g' crypto/Makefile
-          sed -i 's/^obj-\$(CONFIG_CRYPTO_ECDH) += ecdh.o/# obj-\$(CONFIG_CRYPTO_ECDH) += ecdh.o/g' crypto/Makefile
+          sed -i "s/^config CRYPTO_ECDSA/# config CRYPTO_ECDSA/g" crypto/Kconfig
+          sed -i "s/^config CRYPTO_ECDH/# config CRYPTO_ECDH/g" crypto/Kconfig
+          sed -i "s/^config CRYPTO_ECC/# config CRYPTO_ECC/g" crypto/Kconfig
+          sed -i "s/^obj-\$(CONFIG_CRYPTO_ECDSA) += ecdsa.o/# obj-\$(CONFIG_CRYPTO_ECDSA) += ecdsa.o/g" crypto/Makefile
+          sed -i "s/^obj-\$(CONFIG_CRYPTO_ECDH) += ecdh.o/# obj-\$(CONFIG_CRYPTO_ECDH) += ecdh.o/g" crypto/Makefile
           cd -
           bash scripts/build.sh all
           
