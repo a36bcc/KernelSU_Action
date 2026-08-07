@@ -221,17 +221,18 @@ jobs:
           sed -i 's/.*register_trace_android_vh_ipv6_gen_linklocal_addr.*/ret = 0;/' drivers/misc/mediatek/ccmni/ccmni.c
           sed -i 's/static void mtk_dis_ipv6_lla(/static void __maybe_unused mtk_dis_ipv6_lla(/' drivers/misc/mediatek/ccmni/ccmni.c
           
-          # 修复指纹驱动: 创建 mtk_spi_hal.h 空文件
+          # 修复指纹驱动: 创建 mtk_spi.h 和 mtk_spi_hal.h
           mkdir -p drivers/input/fingerprint/goodix
           mkdir -p drivers/input/fingerprint/fpc
+          touch drivers/input/fingerprint/goodix/mtk_spi.h
           touch drivers/input/fingerprint/goodix/mtk_spi_hal.h
           touch drivers/input/fingerprint/fpc/mtk_spi_hal.h
+          # 将 gf_spi_tee.h 中的 <linux/spi/mt_spi.h> 替换为 "mtk_spi.h"
+          sed -i 's/#include <linux\/spi\/mt_spi.h>/#include "mtk_spi.h"/' drivers/input/fingerprint/goodix/gf_spi_tee.h
           
-          # 修复 gf_spi_tee.h: 包含 mt_spi.h
-          sed -i '1i #include <linux/spi/mt_spi.h>' drivers/input/fingerprint/goodix/gf_spi_tee.h
-          
-          # 修复 apu-driver.c: 删除重复的 devfreq_update_stats 定义，注释掉 update_devfreq 调用
+          # 修复 apu-driver.c: 删除重复的 devfreq_update_stats 定义
           sed -i '/^static inline int devfreq_update_stats/,/^}/d' drivers/misc/mediatek/apusys/power/2.5/common/apu-driver.c
+          # 注释掉 update_devfreq 调用
           sed -i 's/update_devfreq(ad->df);/\/\/ update_devfreq(ad->df);/' drivers/misc/mediatek/apusys/power/2.5/common/apu-driver.c
           
           cd -
