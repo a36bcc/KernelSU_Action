@@ -195,14 +195,21 @@ jobs:
           sed -i '/ecdh/d' crypto/Makefile
           sed -i '/ecdsa/d' crypto/Makefile
           rm -f crypto/*.o crypto/*.a crypto/*.asn1.*
-          # 修复 rpmb-mtk.c 符号缺失 + 未使用变量
+          
+          # 修复 rpmb-mtk.c
           sed -i '/^#include/a extern struct mmc_host *mtk_mmc_host[];' drivers/char/rpmb/rpmb-mtk.c
           sed -i 's/struct mmc_host \*mmc = mtk_mmc_host\[0\];/\/\/ struct mmc_host *mmc = mtk_mmc_host[0];/' drivers/char/rpmb/rpmb-mtk.c
-          # 修复未使用的函数（添加 __maybe_unused 属性）
           sed -i 's/static int hmac_sha256(/static int __maybe_unused hmac_sha256(/' drivers/char/rpmb/rpmb-mtk.c
           sed -i 's/static void rpmb_dump_frame(/static void __maybe_unused rpmb_dump_frame(/' drivers/char/rpmb/rpmb-mtk.c
           sed -i 's/static int rpmb_open(/static int __maybe_unused rpmb_open(/' drivers/char/rpmb/rpmb-mtk.c
           sed -i 's/static int rpmb_close(/static int __maybe_unused rpmb_close(/' drivers/char/rpmb/rpmb-mtk.c
+          
+          # 修复 disp_arr.h 缺失
+          sed -i '1i #include "ged_dvfs.h"' drivers/gpu/mediatek/ged/src/ged_kpi.c
+          
+          # 修复 devfreq_simple_ondemand_data 不完整
+          sed -i '/^#include <linux\/devfreq.h>/a #include <linux/devfreq.h>' drivers/scsi/ufs/ufshcd.h
+          
           cd -
           bash scripts/build.sh all
           
