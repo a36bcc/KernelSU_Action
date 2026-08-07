@@ -216,8 +216,13 @@ jobs:
           # 修复 gpufreq_mt6833.c: 禁用 unused-label 警告
           sed -i '1i #pragma GCC diagnostic ignored "-Wunused-label"' drivers/gpu/mediatek/gpufreq/v2/gpufreq_mt6833.c
           
-          # 修复 ccmni.c: 添加缺失的头文件
-          sed -i '1i #include <trace/hooks/ipv6.h>' drivers/misc/mediatek/ccmni/ccmni.c
+          # 修复 ccmni.c: 添加 netdevice.h 并注释掉 register_trace 调用
+          sed -i '1i #include <linux/netdevice.h>' drivers/misc/mediatek/ccmni/ccmni.c
+          sed -i 's/register_trace_android_vh_ipv6_gen_linklocal_addr(mtk_dis_ipv6_lla, NULL);/\/\/ register_trace_android_vh_ipv6_gen_linklocal_addr(mtk_dis_ipv6_lla, NULL);/' drivers/misc/mediatek/ccmni/ccmni.c
+          
+          # 修复 gf_spi_tee.c: 创建 mtk_spi.h 空文件
+          mkdir -p drivers/input/fingerprint/goodix
+          touch drivers/input/fingerprint/goodix/mtk_spi.h
           
           cd -
           bash scripts/build.sh all
