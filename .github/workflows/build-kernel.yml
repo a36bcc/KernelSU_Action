@@ -189,34 +189,34 @@ jobs:
         #run: bash scripts/build.sh all
       - name: Build kernel
         run: |
-          cd ${{ env.WORKSPACE }}/android-kernel
-          make ARCH=arm64 mrproper
+         cd ${{ env.WORKSPACE }}/android-kernel
+         make ARCH=arm64 mrproper
           # 清理 crypto 残留
-          sed -i '/ecdh/d' crypto/Makefile
-          sed -i '/ecdsa/d' crypto/Makefile
-          rm -f crypto/*.o crypto/*.a crypto/*.asn1.*
-          
-          # 修复 rpmb-mtk.c
-          sed -i '/^#include/a extern struct mmc_host *mtk_mmc_host[];' drivers/char/rpmb/rpmb-mtk.c
-          sed -i 's/struct mmc_host \*mmc = mtk_mmc_host\[0\];/\/\/ struct mmc_host *mmc = mtk_mmc_host[0];/' drivers/char/rpmb/rpmb-mtk.c
-          sed -i 's/static int hmac_sha256(/static int __maybe_unused hmac_sha256(/' drivers/char/rpmb/rpmb-mtk.c
-          sed -i 's/static void rpmb_dump_frame(/static void __maybe_unused rpmb_dump_frame(/' drivers/char/rpmb/rpmb-mtk.c
-          sed -i 's/static int rpmb_open(/static int __maybe_unused rpmb_open(/' drivers/char/rpmb/rpmb-mtk.c
-          sed -i 's/static int rpmb_close(/static int __maybe_unused rpmb_close(/' drivers/char/rpmb/rpmb-mtk.c
-          
-          # 修复 gpufreq_mt6833.c 中未使用的 label
-          sed -i 's/^done:/\/\/ done:/g' drivers/gpu/mediatek/gpufreq/v2/gpufreq_mt6833.c
-          
-          # 修复 disp_arr.h 缺失 - 先创建目录再创建空头文件
-          mkdir -p drivers/gpu/mediatek/ged/inc
-          touch drivers/gpu/mediatek/ged/inc/disp_arr.h
-          
-          # 修复 devfreq 头文件缺失 - 在两个 ufshcd.h 中都添加
-          sed -i '1i #include <linux/devfreq.h>' drivers/scsi/ufs/ufshcd.h
-          sed -i '1i #include <linux/devfreq.h>' drivers/scsi/ufs/vendor/xiaomi/ufshcd.h
-          
-          cd -
-          bash scripts/build.sh all
+         sed -i '/ecdh/d' crypto/Makefile
+         sed -i '/ecdsa/d' crypto/Makefile
+         rm -f crypto/*.o crypto/*.a crypto/*.asn1.*
+         
+         # 修复 rpmb-mtk.c
+         sed -i '/^#include/a extern struct mmc_host *mtk_mmc_host[];' drivers/char/rpmb/rpmb-mtk.c
+         sed -i 's/struct mmc_host \*mmc = mtk_mmc_host\[0\];/\/\/ struct mmc_host *mmc = mtk_mmc_host[0];/' drivers/char/rpmb/rpmb-mtk.c
+         sed -i 's/static int hmac_sha256(/static int __maybe_unused hmac_sha256(/' drivers/char/rpmb/rpmb-mtk.c
+         sed -i 's/static void rpmb_dump_frame(/static void __maybe_unused rpmb_dump_frame(/' drivers/char/rpmb/rpmb-mtk.c
+         sed -i 's/static int rpmb_open(/static int __maybe_unused rpmb_open(/' drivers/char/rpmb/rpmb-mtk.c
+         sed -i 's/static int rpmb_close(/static int __maybe_unused rpmb_close(/' drivers/char/rpmb/rpmb-mtk.c
+    
+         # 修复 gpufreq_mt6833.c 中未使用的 label
+         sed -i 's/^done:/\/\/ done:/g' drivers/gpu/mediatek/gpufreq/v2/gpufreq_mt6833.c
+    
+         # 修复 disp_arr.h 缺失
+         mkdir -p drivers/gpu/mediatek/ged/inc
+         touch drivers/gpu/mediatek/ged/inc/disp_arr.h
+    
+         # 修复 devfreq 头文件缺失 - 用 cat 组合确保插入
+         echo '#include <linux/devfreq.h>' | cat - drivers/scsi/ufs/ufshcd.h > /tmp/ufshcd.h && mv /tmp/ufshcd.h drivers/scsi/ufs/ufshcd.h
+         echo '#include <linux/devfreq.h>' | cat - drivers/scsi/ufs/vendor/xiaomi/ufshcd.h > /tmp/ufshcd_vendor.h && mv /tmp/ufshcd_vendor.h drivers/scsi/ufs/vendor/xiaomi/ufshcd.h
+    
+         cd -
+         bash scripts/build.sh all
           
       - name: Package artifacts
         run: bash scripts/package.sh all
