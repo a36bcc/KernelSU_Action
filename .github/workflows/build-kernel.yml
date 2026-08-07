@@ -221,13 +221,11 @@ jobs:
           sed -i 's/.*register_trace_android_vh_ipv6_gen_linklocal_addr.*/ret = 0;/' drivers/misc/mediatek/ccmni/ccmni.c
           sed -i 's/static void mtk_dis_ipv6_lla(/static void __maybe_unused mtk_dis_ipv6_lla(/' drivers/misc/mediatek/ccmni/ccmni.c
           
-          # 跳过指纹驱动编译
-          sed -i 's/^obj-y\s*+= goodix\//# obj-y += goodix\//' drivers/input/fingerprint/Makefile
-          sed -i 's/^obj-y\s*+= fpc\//# obj-y += fpc\//' drivers/input/fingerprint/Makefile
-          
-          # 修复 apu-driver.c: 删除重复的 devfreq_update_stats 函数
-          sed -i '/^static inline int devfreq_update_stats/,/^}/d' drivers/misc/mediatek/apusys/power/2.5/common/apu-driver.c
-          sed -i 's/update_devfreq(ad->df);/\/\/ update_devfreq(ad->df);/' drivers/misc/mediatek/apusys/power/2.5/common/apu-driver.c
+          # ===== 彻底禁用指纹 & APUSYS（Makefile + Kconfig 全覆盖） =====
+          find drivers/ -name Makefile -exec sed -i \
+            '/fingerprint\|apusys/s/^\(obj-[ym]\s*\+\s*\)/# \1/' {} \;
+          find drivers/ -name Kconfig -exec sed -i \
+            '/fingerprint\|apusys/s/^/# /' {} \;
           
           cd -
           bash scripts/build.sh all
