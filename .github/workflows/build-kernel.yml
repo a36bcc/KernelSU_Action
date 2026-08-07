@@ -207,7 +207,8 @@ jobs:
           # 修复 gpufreq_mt6833.c 中未使用的 label
           sed -i 's/^done:/\/\/ done:/g' drivers/gpu/mediatek/gpufreq/v2/gpufreq_mt6833.c
           
-          # 修复 disp_arr.h 缺失 - 直接创建空头文件
+          # 修复 disp_arr.h 缺失 - 先创建目录再创建空头文件
+          mkdir -p drivers/gpu/mediatek/ged/inc
           touch drivers/gpu/mediatek/ged/inc/disp_arr.h
           
           # 修复 devfreq 头文件缺失 - 在两个 ufshcd.h 中都添加
