@@ -221,11 +221,15 @@ jobs:
           sed -i 's/.*register_trace_android_vh_ipv6_gen_linklocal_addr.*/ret = 0;/' drivers/misc/mediatek/ccmni/ccmni.c
           sed -i 's/static void mtk_dis_ipv6_lla(/static void __maybe_unused mtk_dis_ipv6_lla(/' drivers/misc/mediatek/ccmni/ccmni.c
           
-          # ===== 彻底禁用指纹 & APUSYS（Makefile + Kconfig 全覆盖） =====
+          # ===== 彻底禁用指纹 & APUSYS =====
           find drivers/ -name Makefile -exec sed -i \
             '/fingerprint\|apusys/s/^\(obj-[ym]\s*\+\s*\)/# \1/' {} \;
           find drivers/ -name Kconfig -exec sed -i \
             '/fingerprint\|apusys/s/^/# /' {} \;
+          
+          # ===== 修复 USB misc 和 TEE teei Kconfig 语法错误 =====
+          sed -i '1s/^/# /' drivers/usb/misc/Kconfig
+          sed -i '1s/^/# /' drivers/tee/teei/Kconfig
           
           cd -
           bash scripts/build.sh all
